@@ -4,13 +4,27 @@ echo "Creating $1 release for QMiner"
 git clone git@github.com:qminer/qminer.git qminer_master
 # install qminer and its dependancies
 cd qminer_master
-npm install
+npm install --production
+# update package-lock
+git add package-lock.json
+git commit -m "Updated package lock"
 # update version
 npm version $1 -m "New release: %s"
+# push updated version and master to main repo
+git push
+cd ..
+
+# create local clone
+git clone git@github.com:qminer/qminer.git qminer_master_docs
+# install qminer and its dependancies
+cd qminer_master_docs
+npm install
 # update documentation
 cd tools
 ./genNodeDoc.sh
 cd ..
+# revert package-lock.json
+git checkout package-lock.json
 # commint new docs
 git status
 git commit -a -m "Documentation update"
